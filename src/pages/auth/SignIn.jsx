@@ -1,8 +1,8 @@
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { Button, Input, message, Typography } from "antd";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../features/auth/authApi";
 import { setAuthData } from "../../features/auth/authSlice";
 
@@ -73,6 +73,15 @@ const LoginPage = () => {
       if (response.success) {
         const { accessToken, refreshToken, user } = response.data;
 
+        // Check user role - only admin and super_admin can access dashboard
+        const userRole = user?.role?.toLowerCase();
+
+        if (userRole !== "admin" && userRole !== "super_admin") {
+          message.error("Access denied. Only administrators can access the dashboard.");
+          setLoading(false);
+          return;
+        }
+
         // Dispatch auth data to Redux store
         dispatch(
           setAuthData({
@@ -110,8 +119,8 @@ const LoginPage = () => {
       console.error("Login error:", error);
       message.error(
         error?.data?.message ||
-          error?.message ||
-          "Login failed. Please check your credentials and try again."
+        error?.message ||
+        "Login failed. Please check your credentials and try again."
       );
     } finally {
       setLoading(false);
@@ -267,3 +276,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
+// hel
